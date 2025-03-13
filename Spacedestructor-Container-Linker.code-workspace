@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../Spacedestructor-Library_1.0.0"
+		}
+	],
+	"settings": {
+		"factorio.versions": [
+			{
+				"name": "2.0",
+				"factorioPath": "l:\\SteamLibrary\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+				"active": true
+			}
+		],
+		"Lua.workspace.userThirdParty": [
+			"c:\\Users\\PC\\AppData\\Roaming\\Code\\User\\workspaceStorage\\89697c5ecc659cec4e84084a8910765e\\justarandomgeek.factoriomod-debug\\sumneko-3rd"
+		],
+		"Lua.workspace.checkThirdParty": "ApplyInMemory"
+	}
+}
