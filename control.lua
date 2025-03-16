@@ -103,16 +103,50 @@ local function StartingItems(Event)
 end
 
 script.on_event(defines.events.on_player_created, StartingItems)
-
-local FindContainers = require("scripts.FindContainers")
-local ManageID = require("scripts.ManageID")
+--Finds all Containers on the same X or Y axis and lists them in to Containers = { top = {Entity}, right = {Entity}, bottom = {Entity}, left = {Entity}}
+FindContainers = require("scripts.FindContainers")
+--Takes a Table of Tables such as the one produced by "FindContainers" to find the largest Sub Table and Returns the Name of it as a String or nil if all Sides are empty.
 FindLargestSizeBiased = require("__Spacedestructor-Library__.scripts.Level_1.FindLargestSizeBiased")
+--If "New" is set to false it will always assign the ID of the assumed Present direct Neighbour.
+--Otherwise ff Number of Entities in Containers is 1 it Assigns a new ID, if Number is greater then 1 it itterates over
 AssignID = require("scripts.AssignID")
 ContainerUpgrade = require("scripts.ContainerUpgrade")
+--[[
+	1) Find Containers. ("FindContainers()" is already near perfect for this.)
+	2) Find Largest Side and overwrite full table with the desired Side. ("FindLargestSizeBiased()" is already near perfect for this.)
+	This is the part where things start going wrong!
+	3) Assign a link_id to every Container on this Side.
+	4) Upgrade Containers if applicable and if yes re run link_id assignment.
+]]
 local function OnBuilt(Event)
 	local Entity = Event.entity
-	if string.sub(Entity.name, 1, 36) == "Spacedestructor-linked-container-2x2" then
-		ManageID(Event.player_index, FindContainers(Entity), Entity)
+	if string.sub(Entity.name, 1, 42) == "Spacedestructor-linked-container-2x2-Tier-" then
+		local Player = game.players[Event.player_index]
+		assert(Player ~= nil and Player.object_name == "LuaPlayer", 'Player must be a "LuaPlayer" object but is actually "' .. tostring(Player.object_name) .. '".')
+		local Containers = FindContainers(Entity)
+		if Debug then log("Containers: " .. serpent.block(Containers)) end
+		assert(type(Containers) == "table", 'Containers must be of type "table" but is actually "' .. type(Containers) .. '".')
+
+		local Side = FindLargestSizeBiased(Containers)
+		if Debug then log("Side: " .. serpent.line(Side)) end
+		assert(type(Side) == "string", 'Side must be type "string" but is actually type "' .. type(Side) .. '".')
+		Containers = Containers[Side]
+		assert(table_size(Containers) > 0, 'Containers must contain at least a single Entity but has only "' .. tostring(table_size(Containers)) .. '".')
+		if Debug then log("Containers: " .. serpent.block(Containers)) end
+		local LinkID = 0
+		if table_size(Containers) == 1 then
+			LinkID = AssignID(Player, Entity, Containers, true)
+		elseif table_size(Containers) > 1 then
+			LinkID = AssignID(Player, Entity, Containers, false)
+		end
+		if Debug then log("Entity: " .. serpent.line(Entity)) end
+		local ForceName = Player.force.name
+		local EntityName = Entity.name
+		local Link = nil
+		if Debug then log('Table Size: "' .. table_size(storage.forces[ForceName][EntityName].links[LinkID]) .. '" - Entity Tier: "' .. tonumber(string.sub(storage.forces[ForceName][EntityName].links[LinkID][1].name, 43, string.len(storage.forces[ForceName][EntityName].links[LinkID][1].name))) .. '".') end
+		if table_size(storage.forces[ForceName][EntityName].links[LinkID]) ~= tonumber(string.sub(storage.forces[ForceName][EntityName].links[LinkID][1].name, 43, string.len(storage.forces[ForceName][EntityName].links[LinkID][1].name))) then
+			ContainerUpgrade(Player, Entity)
+		end
 	end
 end
 
@@ -123,7 +157,10 @@ script.on_event(defines.events.script_raised_revive, OnBuilt)
 script.on_event(defines.events.script_raised_built, OnBuilt)
 
 local function OnMined(Event)
-	--ContainerUpgrade(game.players[Event.player_index], Event.entity)
+	local Entity = Event.entity
+	if string.sub(Entity.name, 1, 42) == "Spacedestructor-linked-container-2x2-Tier-" then
+		--ManageID(Event.player_index, FindContainers(Entity), Entity)
+	end
 end
 
 script.on_event(defines.events.on_player_mined_entity, OnMined)
