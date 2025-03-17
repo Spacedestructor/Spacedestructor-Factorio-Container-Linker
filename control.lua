@@ -117,6 +117,7 @@ ContainerUpgrade = require("scripts.ContainerUpgrade")
 	This is the part where things start going wrong!
 	3) Assign a link_id to every Container on this Side.
 	4) Upgrade Containers if applicable and if yes re run link_id assignment.
+Why is it crashing now?
 ]]
 local function OnBuilt(Event)
 	local Entity = Event.entity
@@ -124,30 +125,31 @@ local function OnBuilt(Event)
 		local Player = game.players[Event.player_index]
 		assert(Player ~= nil and Player.object_name == "LuaPlayer", 'Player must be a "LuaPlayer" object but is actually "' .. tostring(Player.object_name) .. '".')
 		local Containers = FindContainers(Entity)
-		if Debug then log("Containers: " .. serpent.block(Containers)) end
+		--if Debug then log("Containers: " .. serpent.block(Containers)) end
 		assert(type(Containers) == "table", 'Containers must be of type "table" but is actually "' .. type(Containers) .. '".')
-
 		local Side = FindLargestSizeBiased(Containers)
-		if Debug then log("Side: " .. serpent.line(Side)) end
+		--if Debug then log("Side: " .. serpent.line(Side)) end
 		assert(type(Side) == "string", 'Side must be type "string" but is actually type "' .. type(Side) .. '".')
 		Containers = Containers[Side]
 		assert(table_size(Containers) > 0, 'Containers must contain at least a single Entity but has only "' .. tostring(table_size(Containers)) .. '".')
-		if Debug then log("Containers: " .. serpent.block(Containers)) end
+		--if Debug then log("Containers: " .. serpent.block(Containers)) end
 		local LinkID = 0
 		if table_size(Containers) == 1 then
 			LinkID = AssignID(Player, Entity, Containers, true)
 		elseif table_size(Containers) > 1 then
 			LinkID = AssignID(Player, Entity, Containers, false)
 		end
-		if Debug then log("Entity: " .. serpent.line(Entity)) end
+		--if Debug then log("Entity: " .. serpent.line(Entity)) end
 		local ForceName = Player.force.name
 		local EntityName = Entity.name
-		local Link = nil
-		if Debug then log('Table Size: "' .. table_size(storage.forces[ForceName][EntityName].links[LinkID]) .. '" - Entity Tier: "' .. tonumber(string.sub(storage.forces[ForceName][EntityName].links[LinkID][1].name, 43, string.len(storage.forces[ForceName][EntityName].links[LinkID][1].name))) .. '".') end
+		--if Debug then log('Table Size: "' .. table_size(storage.forces[ForceName][EntityName].links[LinkID]) .. '" - Entity Tier: "' .. tonumber(string.sub(storage.forces[ForceName][EntityName].links[LinkID][1].name, 43, string.len(storage.forces[ForceName][EntityName].links[LinkID][1].name))) .. '".') end
 		if table_size(storage.forces[ForceName][EntityName].links[LinkID]) ~= tonumber(string.sub(storage.forces[ForceName][EntityName].links[LinkID][1].name, 43, string.len(storage.forces[ForceName][EntityName].links[LinkID][1].name))) then
 			ContainerUpgrade(Player, Entity)
+		else
+			if Debug then log("\n") end
 		end
 	end
+	--if Debug then log("Entities: " .. serpent.line(Entity.surface.find_entities_filtered{position = Entity.position})) end
 end
 
 script.on_event(defines.events.on_built_entity, OnBuilt)
@@ -159,7 +161,7 @@ script.on_event(defines.events.script_raised_built, OnBuilt)
 local function OnMined(Event)
 	local Entity = Event.entity
 	if string.sub(Entity.name, 1, 42) == "Spacedestructor-linked-container-2x2-Tier-" then
-		--ManageID(Event.player_index, FindContainers(Entity), Entity)
+		ContainerUpgrade(game.players[Event.player_index], Entity)
 	end
 end
 
@@ -167,6 +169,14 @@ script.on_event(defines.events.on_player_mined_entity, OnMined)
 script.on_event(defines.events.on_robot_mined_entity, OnMined)
 
 local function OnDied(Event)
+	local Entity = Event.entity
+	if string.sub(Entity.name, 1, 42) == "Spacedestructor-linked-container-2x2-Tier-" then
+		local Force = Event.force
+		local Players = Force.players
+		local Player = Players[math.random() * table_size(Players)]
+		log('Event is lacking "player_index" parameter, randomly picking "' .. serpent.line(Player) .. '" from Force "' .. serpent.line(Force) .. '".')
+		ContainerUpgrade(Entity, Player)
+	end
 end
 
 script.on_event(defines.events.on_entity_died, OnDied)

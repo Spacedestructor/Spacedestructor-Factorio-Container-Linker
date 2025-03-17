@@ -49,7 +49,7 @@ local function FindContainers(Entity)
 			end
 		end
 	end
-	if Debug then log("Returning Containers: " .. serpent.block(Containers)) end
+	--if Debug then log("Returning Containers: " .. serpent.block(Containers)) end
 	return Containers
 end
 return FindContainers

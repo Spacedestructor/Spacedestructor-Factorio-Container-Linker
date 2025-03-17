@@ -8,42 +8,29 @@ local function BlueprintTest()
 
 	assert(Blueprint)
 
-	if Debug then
-		log("Blueprint: " .. serpent.block(Blueprint))
-		game.print("Blueprint: " .. serpent.line(Blueprint))
-	end
+	--if Debug then log("Blueprint: " .. serpent.block(Blueprint)) end
 
 	local Icons = Blueprint.icons
 
-	if Debug then
-		log("Icons: " .. serpent.block(Icons))
-		game.print("Icons: " .. serpent.line(Icons))
-	end
+	--if Debug then log("Icons: " .. serpent.block(Icons)) end
 
 	local Entities = Blueprint.entities
 
-	if Debug then
-		log("Entities: " .. serpent.block(Entities))
-		game.print("Entities: " .. serpent.line(Entities))
-	end
+	--if Debug then log("Entities: " .. serpent.block(Entities)) end
 
 	local Wires = Blueprint.wires
 
-	if Debug then
-		log("Wires: " .. serpent.block(Wires))
-		game.print("Wires: " .. serpent.line(Wires))
-	end
+	--if Debug then log("Wires: " .. serpent.block(Wires)) end
 
 	local Entity = game.players[1].surface.find_entities_filtered{position = game.players[1].position, radius = 10, type = "linked-container"}
 
 	if Debug then
-		log("Entity: " .. serpent.block(Entity))
-		game.print("Entity: " .. serpent.line(Entity))]]
+		--log("Entity: " .. serpent.block(Entity))
 		--[[
 		for index, entity in pairs(Entity) do
 			for variable, data in pairs(entity) do
 				if type(data) ~= "function" and type(data) ~= "table" and type(data) ~= "userdata" then
-					log("variable: " .. serpent.block(variable))
+					--log("variable: " .. serpent.block(variable))
 					game.print("variable: " .. serpent.line(variable))
 				end
 			end
