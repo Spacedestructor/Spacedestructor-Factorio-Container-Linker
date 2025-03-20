@@ -5,5 +5,5 @@
 	"author": "Spacedestructor",
 	"description": "Comissioned Mod for https://mods.factorio.com/user/fleshynessa. Links Chests together.",
 	"factorio_version": "2.0",
-	"dependencies": ["base", "space-age", "Spacedestructor-Library", "gvv", "0-event-trace", "disable-vanilla-menu-simulations"]
+	"dependencies": ["base", "space-age", "Spacedestructor-Library", "gvv", "0-event-trace", "disable-vanilla-menu-simulations", "even-pickier-dollies"]
 }
