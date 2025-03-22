@@ -109,6 +109,7 @@ FindLargestSizeBiased = require("__Spacedestructor-Library__.scripts.Level_1.Fin
 AssignID = require("scripts.AssignID")
 ContainerUpgrade = require("scripts.ContainerUpgrade")
 DefinesLookup = require("__Spacedestructor-Library__.scripts.Level_2.DefinesLookup")
+CleanUpStorage = require("scripts.CleanUpStorage")
 --[[
 	1) Find Containers. ("FindContainers()" is already near perfect for this.)
 	2) Find Largest Side and overwrite full table with the desired Side. ("FindLargestSizeBiased()" is already near perfect for this.)
@@ -150,6 +151,17 @@ local function OnBuilt(Event)
 			--else if Debug then log("Not upgrading.") end
 			end
 		end
+		--log("Forces: " .. serpent.block(storage.forces))
+		for Force_Name, Force in pairs(storage.forces) do
+			--log('Force "' .. Force_Name .. '": ' .. serpent.block(Force))
+			for Prototype_Name, Prototype in pairs(Force) do
+				--log('Prototype "' .. Prototype_Name .. '": ' .. serpent.block(Prototype))
+				if table_size(Prototype.links) > 0 then
+					CleanUpStorage(Prototype.links)
+					log("Resulting Prototype.links: " .. serpent.block(Prototype.links) .. "\n")
+				end
+			end
+		end
 	end
 	--if Debug then log("Entities: " .. serpent.line(Entity.surface.find_entities_filtered{position = Entity.position})) end
 end
@@ -163,44 +175,44 @@ script.on_event(defines.events.script_raised_built, OnBuilt)
 local function OnMined(Event)
 	local Entity = Event.entity
 	if string.sub(Entity.name, 1, 42) == "Spacedestructor-linked-container-2x2-Tier-" then
-		log("\nEntity to be deconstructed: " .. serpent.block(Entity))
+		--log("\nEntity to be deconstructed: " .. serpent.block(Entity))
 		local Player = game.players[Event.player_index]
 		assert(Player ~= nil and Player.object_name == "LuaPlayer", '\nPlayer must be a "LuaPlayer" object but is actually "' .. tostring(Player.object_name) .. '".')
 		local Containers = FindContainers(Entity)
-		if Debug then log("\nContainers: " .. serpent.block(Containers)) end
+		--if Debug then log("\nContainers: " .. serpent.block(Containers)) end
 		assert(type(Containers) == "table", 'Containers must be of type "table" but is actually "' .. type(Containers) .. '".')
 		local Side = FindLargestSizeBiased(Containers)
-		if Debug then log("Side: " .. serpent.line(Side)) end
+		--if Debug then log("Side: " .. serpent.line(Side)) end
 		assert(type(Side) == "string", 'Side must be type "string" but is actually type "' .. type(Side) .. '".')
 		Containers = Containers[Side]
 		assert(table_size(Containers) > 0, 'Containers must contain at least a single Entity but has only "' .. tostring(table_size(Containers)) .. '".')
-		if Debug then log("Containers: " .. serpent.block(Containers)) end
+		--if Debug then log("Containers: " .. serpent.block(Containers)) end
 		local LinkID = 0
 		if table_size(Containers) == 1 then
 			LinkID = AssignID(Player, Entity, Containers, true)
 		elseif table_size(Containers) > 1 then
 			LinkID = AssignID(Player, Entity, Containers, false)
 		end
-		if Debug then log("Entity: " .. serpent.line(Entity) .. "\nLinkID: " .. serpent.line(LinkID)) end
+		--if Debug then log("Entity: " .. serpent.line(Entity) .. "\nLinkID: " .. serpent.line(LinkID)) end
 		local ForceName = Player.force.name
 		local EntityName = Entity.name
-		if Debug then log("\nstorage.forces[ForceName][EntityName].links: " .. serpent.block(storage.forces[ForceName][EntityName].links) .. "\nstorage.forces[ForceName][EntityName].links[LinkID]: " .. serpent.block(storage.forces[ForceName][EntityName].links[LinkID])) end
+		--if Debug then log("\nstorage.forces[ForceName][EntityName].links: " .. serpent.block(storage.forces[ForceName][EntityName].links) .. "\nstorage.forces[ForceName][EntityName].links[LinkID]: " .. serpent.block(storage.forces[ForceName][EntityName].links[LinkID])) end
 		local Link = storage.forces[ForceName][EntityName].links[LinkID]
-		log("Link: " .. serpent.block(Link))
+		--log("Link: " .. serpent.block(Link))
 		if Link ~= nil then
-			if Debug then log('Table Size: "' .. table_size(Link) .. '" - Entity Tier: "' .. tonumber(string.sub(Link[1].name, 43, string.len(Link[1].name))) .. '".') end
+			--if Debug then log('Table Size: "' .. table_size(Link) .. '" - Entity Tier: "' .. tonumber(string.sub(Link[1].name, 43, string.len(Link[1].name))) .. '".') end
 			if table_size(Link) == tonumber(string.sub(Link[1].name, 43, string.len(Link[1].name))) then
 				--Downgrade Logic Here.
 
 				for i = 1, table_size(Link), 1 do
-					log("Index: " .. i)
+					--log("Index: " .. i)
 					if Entity.unit_number == Link[i].unit_number then
-						log("We should remove this Entity " .. serpent.line(Link[i]))
+						--log("We should remove this Entity " .. serpent.line(Link[i]))
 						table.remove(Link, i)
 						break
 					end
 				end
-				log("New Link: " .. serpent.block(Link))
+				--log("New Link: " .. serpent.block(Link))
 				local Target = table_size(Link)
 				local Entities = {}
 				for Index, Container in pairs(Link) do
@@ -212,92 +224,30 @@ local function OnMined(Event)
 					local Force = Player.force
 					local Character = Player.character
 					local NewEntity = Surface.create_entity{name = Name, position = Position, direction = Direction, quality = Quality, force= Force, fast_replace = false, item_index = 0, player = Player, character = Character, spill = true, raise_built = false, create_build_effect_smoke = false, spawn_decorations = false, move_stuck_players = true, preserve_ghosts_and_corpses = false, bar = Entity.get_inventory(defines.inventory.chest).get_bar()}
-					if Debug then log("Created new Entity: " .. serpent.line(NewEntity)) end
+					--if Debug then log("Created new Entity: " .. serpent.line(NewEntity)) end
 					NewEntity.copy_settings(Container, Player)
 					local Success = Container.destroy{do_cliff_correction = false, raise_destroy = true, player = Player, item_index = 0}
-					if Debug then log("Entity Destroyed: " .. tostring(Success)) end
+					--if Debug then log("Entity Destroyed: " .. tostring(Success)) end
 					assert(Success, 'We cant continue without destroying "' .. serpent.line(Container) .. '" first!')
 					Link[Index] = nil
 					table.insert(Entities, table_size(Entities) + 1, NewEntity)
 				end
-				log("Entities: " .. serpent.block(Entities))
-			else if Debug then log('"Not downgrading."') end
+				--log("Entities: " .. serpent.block(Entities))
+				_ = AssignID(Player, Entities[1], Entities, true)
+			--else if Debug then log('"Not downgrading."') end
 			end
 		end
-
-		--[[
-		local ForceName = Player.force.name
-		local LinkID = Entity.link_id
-		local Link = storage.forces[ForceName][Entity.name].links[LinkID]
-		--log("Link: " .. serpent.block(Link))
-		local Counter = 1
-		while true do
-			if Link == nil then
-				break
-			end
-			Counter = math.min(Counter, table_size(Link))
-			local Container = Link[Counter]
-			if Container == nil or not Container.valid then
-				--log("Link Entity " .. serpent.line(Container) .. " is invalid!\n" .. Counter .. "\n" .. serpent.block(Link))
-				table.remove(Link, Counter)
-			elseif Container.unit_number == Entity.unit_number then
-				log("Event Entity " .. serpent.line(Entity) .. " matches Link Entity " .. serpent.line(Container) .. " at Index " .. Counter .. ".")
-				table.remove(Link, Counter)
-			else
-				Counter = Counter + 1
-			end
-			if Counter >= table_size(Link) then
-				break
-			end
-		end
-		log("Links: " .. serpent.block(Link))
-		if Link ~= nil then
-			local Target = table_size(Link)
-			--log("Target: " .. Target)
-			local Tier = tonumber(string.sub(Entity.name, 43, string.len(Entity.name)))
-			--log("Tier: " .. Tier)
-			if Tier > Target then
-				local Entities = {}
-				Counter = 1
-				while true do
-					local Container = Link[Counter]
-					--log("Container: " .. serpent.block(Container) .. " at index " .. Counter)
-					--log("Index " .. Counter .. " out of " .. Tier .. "\nContainer ~= nil: " .. tostring(Container ~= nil) .. "\nContainer.valid: " .. tostring(Container.valid) .. "\nContainer.unit_number ~= Entity.unit_number: " .. tostring(Container.unit_number ~= Entity.unit_number) .. "\n Combined: " .. tostring(Container ~= nil and Container.valid and Container.unit_number ~= Entity.unit_number))
-					if Container ~= nil and Container.valid then
-						if Container.unit_number ~= Entity.unit_number then
-							local Surface = Container.surface
-							local Name = prototypes.entity["Spacedestructor-linked-container-2x2-Tier-" .. Target]
-							--log("Prototype: " .. serpent.line(prototypes.entity["Spacedestructor-linked-container-2x2-Tier-" .. Target]))
-							local Position = Container.position
-							local Direction = defines.direction.north
-							local Quality = Container.quality
-							local Character = Player.character
-							local Force = Player.force
-							local NewEntity = Surface.create_entity{name = Name, position = Position, direction = Direction, quality = Quality, force= Force, fast_replace = false, item_index = 0, player = Player, character = Character, spill = true, raise_built = false, create_build_effect_smoke = false, spawn_decorations = false, move_stuck_players = true, preserve_ghosts_and_corpses = false, bar = Container.get_inventory(defines.inventory.chest).get_bar()}
-							--log("Created new Container: " .. serpent.line(NewEntity))
-							--if Debug then log("Created new Container: " .. serpent.line(NewEntity)) end
-							assert(NewEntity ~= nil and NewEntity.object_name == "LuaEntity" and NewEntity.valid, "Failed to Create New Entity!")
-							NewEntity.copy_settings(Container, Player)
-							local Success = Container.destroy{do_cliff_correction = false, raise_destroy = true, player = Player, item_index = 0}
-							--if Debug then log("Container Destroyed: " .. tostring(Success)) end
-							assert(Success, 'We cant continue without destroying "' .. serpent.line(Container) .. '" first!')
-							table.remove(Link, Counter)
-							table.insert(Entities, table_size(Entities) + 1, NewEntity)
-						end
-					else
-						--if Debug then log("Invalid Container " .. serpent.line(Container)) end
-						table.remove(Link, Counter)
-					end
-					if Counter <= Tier then
-						break
-					else
-						Counter = Counter + 1
-					end
+		--log("Forces: " .. serpent.block(storage.forces))
+		for Force_Name, Force in pairs(storage.forces) do
+			--log('Force "' .. Force_Name .. '": ' .. serpent.block(Force))
+			for Prototype_Name, Prototype in pairs(Force) do
+				--log('Prototype "' .. Prototype_Name .. '": ' .. serpent.block(Prototype))
+				if table_size(Prototype.links) > 0 then
+					CleanUpStorage(Prototype.links)
+					log("Resulting Prototype.links: " .. serpent.block(Prototype.links) .. "\n")
 				end
-				log("Link: " .. serpent.line(Link) .. "\nEntities: " .. serpent.block(Entities) --[[.. "\nCalling AssignID()"]]--)
-				--_ = AssignID(Player, Entities[1], Entities, false)
-			--end
-		--end
+			end
+		end
 	end
 end
 
