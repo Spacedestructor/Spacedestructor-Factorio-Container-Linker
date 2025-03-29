@@ -3,6 +3,11 @@
 Debug = false
 if script.active_mods["gvv"] then require("__gvv__.gvv")(); Debug = true end
 if script.active_mods["0-event-trace"] then Debug = true end
+<<<<<<< Updated upstream
+=======
+if __DebugAdapter ~= nil then Debug = true end
+log("Debug Mode: " .. tostring(Debug))
+>>>>>>> Stashed changes
 
 --[[
 	Requirements:
@@ -47,6 +52,7 @@ if script.active_mods["0-event-trace"] then Debug = true end
 	Ex: Setting set to 30 (default value) and tier limit set to 6 (default value) the progression will be the following: 30, 60, 90, 120, 150, 180.
 ]]
 
+<<<<<<< Updated upstream
 PrintSettings = {color = {r = 255, g = 255, b = 255, a = 255}, sound = defines.print_sound.never, skip = defines.print_skip.never, game_state = false}
 local StartingItem = {
 	{name = "Spacedestructor-linked-container-2x2-Tier-1", count = 6},
@@ -106,15 +112,32 @@ script.on_event(defines.events.on_player_created, StartingItems)
 
 local FindContainers = require("scripts.FindContainers")
 local ManageID = require("scripts.ManageID")
+=======
+PrintSettings = { color = { r = 255, g = 255, b = 255, a = 255 }, sound = defines.print_sound.never, skip = defines.print_skip.never, game_state = false }
+StartingItems = require("scripts.Debug")
+
+script.on_event(defines.events.on_player_created, StartingItems)
+
+--Finds all Containers on the same X or Y axis and lists them in to Containers = { top = {Entity}, right = {Entity}, bottom = {Entity}, left = {Entity}}
+FindContainers = require("scripts.FindContainers")
+--Takes a Table of Tables such as the one produced by "FindContainers" to find the largest Sub Table and Returns the Name of it as a String or nil if all Sides are empty.
+>>>>>>> Stashed changes
 FindLargestSizeBiased = require("__Spacedestructor-Library__.scripts.Level_1.FindLargestSizeBiased")
 AssignID = require("scripts.AssignID")
 ContainerUpgrade = require("scripts.ContainerUpgrade")
+<<<<<<< Updated upstream
 local function OnBuilt(Event)
 	local Entity = Event.entity
 	if string.sub(Entity.name, 1, 36) == "Spacedestructor-linked-container-2x2" then
 		ManageID(Event.player_index, FindContainers(Entity), Entity)
 	end
 end
+=======
+DefinesLookup = require("__Spacedestructor-Library__.scripts.Level_2.DefinesLookup")
+Clean = require("scripts.Clean")
+
+OnBuilt = require("scripts.OnBuilt")
+>>>>>>> Stashed changes
 
 script.on_event(defines.events.on_built_entity, OnBuilt)
 script.on_event(defines.events.on_robot_built_entity, OnBuilt)
@@ -122,33 +145,29 @@ script.on_event(defines.events.on_space_platform_built_entity, OnBuilt)
 script.on_event(defines.events.script_raised_revive, OnBuilt)
 script.on_event(defines.events.script_raised_built, OnBuilt)
 
+<<<<<<< Updated upstream
 local function OnMined(Event)
 	--ContainerUpgrade(game.players[Event.player_index], Event.entity)
 end
+=======
+Downgrade = require("scripts.ContainerDowngrade")
+
+OnMined = require("scripts.OnMined")
+>>>>>>> Stashed changes
 
 script.on_event(defines.events.on_player_mined_entity, OnMined)
 script.on_event(defines.events.on_robot_mined_entity, OnMined)
 
+<<<<<<< Updated upstream
 local function OnDied(Event)
 end
+=======
+OnDied = require("scripts.OnDied")
+>>>>>>> Stashed changes
 
 script.on_event(defines.events.on_entity_died, OnDied)
---upgrading containers isnt implemented yet, dont forget about it.
-local function Init()
-	storage.prototypes = storage.prototypes or {}
-	storage.forces = storage.forces or {}
-	for _, Force in pairs(game.forces) do
-		local ForceName = Force.name
-		storage.forces[ForceName] = storage.forces[ForceName] or {}
-		for _, Prototype in pairs(prototypes.get_entity_filtered({{filter = "type", type = "linked-container"}})) do
-			if string.sub(Prototype.name, 1, 42) == "Spacedestructor-linked-container-2x2-Tier-" then
-				storage.prototypes[Prototype.name] = true
-				storage.forces[ForceName][Prototype.name] = storage.forces[ForceName][Prototype.name] or {}
-				storage.forces[ForceName][Prototype.name].links = storage.forces[ForceName][Prototype.name].links or {}
-			end
-		end
-	end
-end
+
+Init = require("scripts.Init")
 
 --New Game
 
