@@ -3,7 +3,6 @@
 Debug = false
 if script.active_mods["gvv"] then require("__gvv__.gvv")(); Debug = true end
 if script.active_mods["0-event-trace"] then Debug = true end
-
 if __DebugAdapter ~= nil then Debug = true end
 log("Debug Mode: " .. tostring(Debug))
 
@@ -111,15 +110,28 @@ local FindContainers = require("scripts.FindContainers")
 local ManageID = require("scripts.ManageID")
 
 PrintSettings = { color = { r = 255, g = 255, b = 255, a = 255 }, sound = defines.print_sound.never, skip = defines.print_skip.never, game_state = false }
-StartingItems = require("scripts.Debug")
 
-script.on_event(defines.events.on_player_created, StartingItems)
+--Our Starting Items for Debugging purposes.
+StartingItems = require("__Spacedestructor-Library__.scripts.Level_1.Debug")
+script.on_event(defines.events.on_player_created,
+	function(Event)
+		StartingItems(Event, {
+			{name = "Spacedestructor-linked-container-2x2-Tier-1", count = 6},
+			{name = "infinity-chest", count = 2},
+			{name = "fast-inserter", count = 2},
+			{name = "substation", count = 1},
+			{name = "electric-energy-interface", count = 1}
+		})
+	end
+)
 
 --Finds all Containers on the same X or Y axis and lists them in to Containers = { top = {Entity}, right = {Entity}, bottom = {Entity}, left = {Entity}}
 FindContainers = require("scripts.FindContainers")
 --Takes a Table of Tables such as the one produced by "FindContainers" to find the largest Sub Table and Returns the Name of it as a String or nil if all Sides are empty.
 
 FindLargestSizeBiased = require("__Spacedestructor-Library__.scripts.Level_1.FindLargestSizeBiased")
+--If "New" is set to false it will always assign the ID of the assumed Present direct Neighbour.
+--Otherwise ff Number of Entities in Containers is 1 it Assigns a new ID, if Number is greater then 1 it itterates over
 AssignID = require("scripts.AssignID")
 ContainerUpgrade = require("scripts.ContainerUpgrade")
 
@@ -140,7 +152,6 @@ script.on_event(defines.events.on_robot_built_entity, OnBuilt)
 script.on_event(defines.events.on_space_platform_built_entity, OnBuilt)
 script.on_event(defines.events.script_raised_revive, OnBuilt)
 script.on_event(defines.events.script_raised_built, OnBuilt)
-
 local function OnMined(Event)
 	--ContainerUpgrade(game.players[Event.player_index], Event.entity)
 end
@@ -152,8 +163,7 @@ OnMined = require("scripts.OnMined")
 script.on_event(defines.events.on_player_mined_entity, OnMined)
 script.on_event(defines.events.on_robot_mined_entity, OnMined)
 
-local function OnDied(Event)
-end
+local function OnDied(Event) end
 
 OnDied = require("scripts.OnDied")
 

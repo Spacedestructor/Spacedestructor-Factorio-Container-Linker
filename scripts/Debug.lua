@@ -1,13 +1,13 @@
---Our Starting Items for Debugging purposes.
-local StartingItem = {
-	{name = "Spacedestructor-linked-container-2x2-Tier-1", count = 6},
-	{name = "infinity-chest", count = 2},
-	{name = "fast-inserter", count = 2},
-	{name = "substation", count = 1},
-	{name = "electric-energy-interface", count = 1}
-}
 ---Will get Player 1, enabled cheat mode, attempt to get Player Character and if true attempt to insert Starting Items and set the hotbar slots to them as well.
 local function InsertStartingItems()
+	--Our Starting Items for Debugging purposes.
+	local StartingItem = {
+		{name = "Spacedestructor-linked-container-2x2-Tier-1", count = 6},
+		{name = "infinity-chest", count = 2},
+		{name = "fast-inserter", count = 2},
+		{name = "substation", count = 1},
+		{name = "electric-energy-interface", count = 1}
+	}
 	local Player = game.players[1]
 	Player.cheat_mode = true
 	local Character = Player.character

@@ -14,8 +14,6 @@ local function FindContainers(Entity)
 	assert(Position ~= nil and type(Position) == "table" and (type(Position[1]) == "number" or type(Position.x) == "number") and (type(Position[2]) == "number" or type(Position.y) == "number"), 'Position is "' .. serpent.line(Position) .. '(' .. type(Position) .. ', Valid: ' .. tostring((type(Position[1]) == "number" or type(Position.x) == "number") and (type(Position[2]) == "number" or type(Position.y) == "number")) .. ')".')
 	if Debug then log("Position: " .. serpent.line(Position)) end
 	local Tiers = settings.startup["Spacedestructor-TierLimit"].value
-<<<<<<< Updated upstream
-=======
 	--No Assert here since Factorio already validates Settings and this is just a simple Integer situation.
 	if Debug then log("Tiers: " .. Tiers) end
 	local Names = {}
@@ -24,7 +22,6 @@ local function FindContainers(Entity)
 	end
 	assert(type(Names) == "table" and table_size(Names) > 0, "Names is " .. type(Names) .. " with size " .. table_size(Names))
 	if Debug then log("Names : " .. serpent.block(Names)) end
->>>>>>> Stashed changes
 	local Containers = {
 		top = {
 			Entity
@@ -39,14 +36,10 @@ local function FindContainers(Entity)
 			Entity
 		}
 	}
-<<<<<<< Updated upstream
-	for _, Direction in pairs({"top", "right", "bottom", "left"}) do
-=======
 	if Debug then log("Containers: " .. serpent.block(Containers)) end
 	local Directions = {"top", "right", "bottom", "left"}
 	--For each Direction it attempts to find Neighbours ordered from closest to furthest.
 	for _, DirectionName in pairs(Directions) do
->>>>>>> Stashed changes
 		for i = 1, Tiers-1, 1 do
 			local Offset = {x = 0, y = 0}
 			if DirectionName == "top" then
@@ -58,16 +51,6 @@ local function FindContainers(Entity)
 			elseif DirectionName == "left" then
 				Offset = {x = -(2 * i), y = 0}
 			end
-<<<<<<< Updated upstream
-			local Container = Surface.find_entity(Entity.name, {Position.x + Offset.x, Position.y + Offset.y})
-			if Container == nil then
-				break
-			else
-				table.insert(Containers[Direction], table_size(Containers[Direction]) + 1, Container)
-			end
-		end
-	end
-=======
 			if Debug then log('Offset: "' .. serpent.line(Offset) .. '" Direction: "' .. DirectionName .. '"') end
 			local Container = Surface.find_entities_filtered{name = Names, position = {Position.x + Offset.x, Position.y + Offset.y}}
 			if Debug then log("Container: " .. serpent.line(Container)) end
@@ -83,7 +66,6 @@ local function FindContainers(Entity)
 		end
 	end
 	if Debug then log("Returning Containers: " .. serpent.block(Containers)) end
->>>>>>> Stashed changes
 	return Containers
 end
 return FindContainers
