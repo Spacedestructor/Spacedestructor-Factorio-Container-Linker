@@ -29,17 +29,17 @@ local function GeneratePrototypes()
 		Item.place_result = "Spacedestructor-linked-container-2x2-Tier-" .. i
 		Item.hidden = false
 		table.insert(Prototypes, table_size(Prototypes) + 1, Item)
-	
+
 		local Chest = Deepcopy(data.raw["linked-container"][settings.startup["Spacedestructor-LinkedTemplate"].value])
 		Chest.name = "Spacedestructor-linked-container-2x2-Tier-" .. i
 		Chest.collision_box = {{-0.9, -0.9},{0.9, 0.9}}
 		Chest.selection_box = {{-0.9, -0.9},{0.9, 0.9}}
 		Chest.picture = data.raw[settings.startup["Spacedestructor-ContainerType"].value][settings.startup["Spacedestructor-LinkedSprite"].value].picture
-		Chest.inventory_size =  settings.startup["Spacedestructor-InventorySlots"].value
-		Chest.minable.result = "Spacedestructor-linked-container-2x2-Tier-" .. i
+		Chest.inventory_size =  settings.startup["Spacedestructor-InventorySlots"].value * i
+		Chest.minable.result = "Spacedestructor-linked-container-2x2-Tier-1"
 		Chest.hidden = false
 		Chest.gui_mode = "none"
-		if i < settings.startup["Spacedestructor-TierLimit"].value then
+		if i < Tiers then
 			Chest.next_upgrade = "Spacedestructor-linked-container-2x2-Tier-" .. (i + 1)
 		end
 		--If we had Containers of different sizes this would allow us the ability to dynamically adjust the Sprites of these Containers, however as of right now this function is entirely unused.
