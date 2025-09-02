@@ -65,7 +65,7 @@ local function GeneratePrototypes()
 			},
 			{
 				type = "item",
-				name = "electronic-circuit",
+				name = "fast-transport-belt",
 				amount = 5
 			}
 		},
