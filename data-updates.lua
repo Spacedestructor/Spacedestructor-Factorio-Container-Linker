@@ -48,6 +48,36 @@ local function GeneratePrototypes()
 		FindSpriteProperties(Chest.picture, 2, 2)
 		table.insert(Prototypes, table_size(Prototypes) + 1, Chest)
 	end
+	local Recipe = {
+		type = "recipe",
+		name = "Spacedestructor-linked-container-2x2-Tier-1",
+		enabled = true,
+		ingredients = {
+			{
+				type = "item",
+				name = "steel-chest",
+				amount = 5
+			},
+			{
+				type = "item",
+				name = "electronic-circuit",
+				amount = 5
+			},
+			{
+				type = "item",
+				name = "electronic-circuit",
+				amount = 5
+			}
+		},
+		results = {
+			{
+				type = "item",
+				name = "Spacedestructor-linked-container-2x2-Tier-1",
+				amount = 1
+			}
+		}
+	}
+	table.insert(Prototypes, table_size(Prototypes) + 1, Recipe)
 	--log("#" .. table_size(Prototypes) .. " Prototypes to Register: " .. serpent.block(Prototypes))
 
 	data:extend(Prototypes)
