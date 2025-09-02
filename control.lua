@@ -49,66 +49,6 @@ log("Debug Mode: " .. tostring(Debug))
 	Ex: Setting set to 30 (default value) and tier limit set to 6 (default value) the progression will be the following: 30, 60, 90, 120, 150, 180.
 ]]
 
-PrintSettings = {color = {r = 255, g = 255, b = 255, a = 255}, sound = defines.print_sound.never, skip = defines.print_skip.never, game_state = false}
-local StartingItem = {
-	{name = "Spacedestructor-linked-container-2x2-Tier-1", count = 6},
-	{name = "Spacedestructor-linked-container-2x2-Tier-2", count = 6},
-	{name = "Spacedestructor-linked-container-2x2-Tier-3", count = 6},
-	{name = "Spacedestructor-linked-container-2x2-Tier-4", count = 6},
-	{name = "Spacedestructor-linked-container-2x2-Tier-5", count = 6},
-	{name = "Spacedestructor-linked-container-2x2-Tier-6", count = 6},
-	{name = "infinity-chest", count = 2},
-	{name = "fast-inserter", count = 2},
-	{name = "substation", count = 1},
-	{name = "electric-energy-interface", count = 1}
-}
-local function InsertStartingItems()
-	local Player = game.players["Spacedestructor"]
-	Player.cheat_mode = true
-	local Character = Player.character
-	if Character then
-		local Inventory = Player.get_main_inventory()
-		if Inventory ~= nil then
-			local Slot = 1
-			for _, value in pairs(StartingItem) do
-				if value ~= nil and value.name ~= nil and value.count ~= nil then
-					if Inventory.can_insert(value) then
-						Inventory.insert(value)
-						local ItemStack = Inventory.find_item_stack(value.name)
-						Player.set_quick_bar_slot(Slot, ItemStack)
-					end
-					Slot = Slot + 1
-				else
-					error('Entry "' .. serpent.block(value) .. '" is invalid!')
-				end
-			end
-			script.on_event(defines.events.on_tick, nil)
-		end
-	end
-end
-
-local function DelayedStartingItems(Event)
-	if Event.tick > 0 then
-		InsertStartingItems()
-	end
-end
-
-local function StartingItems(Event)
-	local Player = game.players[Event.player_index]
-	if Player.name == "Spacedestructor" then
-		if Event.tick < 1 then
-			script.on_event(defines.events.on_tick, DelayedStartingItems)
-		else
-			InsertStartingItems()
-		end
-	end
-end
-
-script.on_event(defines.events.on_player_created, StartingItems)
-
-local FindContainers = require("scripts.FindContainers")
-local ManageID = require("scripts.ManageID")
-
 PrintSettings = { color = { r = 255, g = 255, b = 255, a = 255 }, sound = defines.print_sound.never, skip = defines.print_skip.never, game_state = false }
 
 --Our Starting Items for Debugging purposes.
@@ -128,20 +68,11 @@ script.on_event(defines.events.on_player_created,
 --Finds all Containers on the same X or Y axis and lists them in to Containers = { top = {Entity}, right = {Entity}, bottom = {Entity}, left = {Entity}}
 FindContainers = require("scripts.FindContainers")
 --Takes a Table of Tables such as the one produced by "FindContainers" to find the largest Sub Table and Returns the Name of it as a String or nil if all Sides are empty.
-
 FindLargestSizeBiased = require("__Spacedestructor-Library__.scripts.Level_1.FindLargestSizeBiased")
 --If "New" is set to false it will always assign the ID of the assumed Present direct Neighbour.
 --Otherwise ff Number of Entities in Containers is 1 it Assigns a new ID, if Number is greater then 1 it itterates over
 AssignID = require("scripts.AssignID")
 ContainerUpgrade = require("scripts.ContainerUpgrade")
-
-local function OnBuilt(Event)
-	local Entity = Event.entity
-	if string.sub(Entity.name, 1, 36) == "Spacedestructor-linked-container-2x2" then
-		ManageID(Event.player_index, FindContainers(Entity), Entity)
-	end
-end
-
 DefinesLookup = require("__Spacedestructor-Library__.scripts.Level_2.DefinesLookup")
 Clean = require("scripts.Clean")
 
@@ -152,9 +83,6 @@ script.on_event(defines.events.on_robot_built_entity, OnBuilt)
 script.on_event(defines.events.on_space_platform_built_entity, OnBuilt)
 script.on_event(defines.events.script_raised_revive, OnBuilt)
 script.on_event(defines.events.script_raised_built, OnBuilt)
-local function OnMined(Event)
-	--ContainerUpgrade(game.players[Event.player_index], Event.entity)
-end
 
 Downgrade = require("scripts.ContainerDowngrade")
 
@@ -162,8 +90,6 @@ OnMined = require("scripts.OnMined")
 
 script.on_event(defines.events.on_player_mined_entity, OnMined)
 script.on_event(defines.events.on_robot_mined_entity, OnMined)
-
-local function OnDied(Event) end
 
 OnDied = require("scripts.OnDied")
 
